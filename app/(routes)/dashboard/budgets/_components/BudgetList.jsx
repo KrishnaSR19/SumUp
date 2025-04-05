@@ -41,7 +41,7 @@ function BudgetList() {
       // .orderBy(desc(Bud))
       ;                                  // Group by budget ID to aggregate
 
-    console.log("Fetched budgets:", result);
+    // console.log("Fetched budgets:", result);
     setBudgetList(result); // Save the result to state
   };
 
