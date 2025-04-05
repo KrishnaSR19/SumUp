@@ -13,6 +13,7 @@ import { Budgets } from "@/utils/schema";
 import { db } from "@/utils/dbConfig"; // Ensure this is correctly exported in dbConfig.js
 
 import { eq } from "drizzle-orm"; // Import Drizzle ORM query function
+import { toast } from "sonner";
 
 function DashboardLayout({ children }) {
   // Get the logged-in user from Clerk
@@ -21,10 +22,10 @@ function DashboardLayout({ children }) {
   // Initialize Next.js router
   const router = useRouter();
 
-  // Debugging logs to check if imports and user data are correctly loaded
-  console.log("DB Instance:", db); // Ensure `db` is properly imported
-  console.log("Budgets Schema:", Budgets); // Verify that `Budgets` schema is imported correctly
-  console.log("User Object:", user); // Check if the user object is available
+  // // Debugging logs to check if imports and user data are correctly loaded
+  // console.log("DB Instance:", db); // Ensure `db` is properly imported
+  // console.log("Budgets Schema:", Budgets); // Verify that `Budgets` schema is imported correctly
+  // console.log("User Object:", user); // Check if the user object is available
 
   // Run `checkUserBudgets` when the `user` state changes
   useEffect(() => {
@@ -36,7 +37,7 @@ function DashboardLayout({ children }) {
   // Function to check if the user has any budgets
   const checkUserBudgets = async () => {
     try {
-      console.log("User Email:", user?.primaryEmailAddress?.emailAddress); // Log user email for debugging
+      // console.log("User Email:", user?.primaryEmailAddress?.emailAddress); // Log user email for debugging
 
       // Ensure `db` and `Budgets` schema are correctly initialized
       if (!db || !Budgets) {
@@ -55,14 +56,14 @@ function DashboardLayout({ children }) {
         .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress)) // Filter by user's email
         .execute(); // Execute the query (required for Drizzle ORM)
 
-      console.log("Query Result:", result); // Log the result for debugging
+      // console.log("Query Result:", result); // Log the result for debugging
 
       // If the user has no budgets, redirect them to the budgets page
       if (!result || result.length === 0) {
         router.replace("/dashboard/budgets"); // Redirect user to budget creation page
       }
     } catch (error) {
-      console.error("Error fetching budgets:", error); // Log any errors
+      toast.error("Error fetching budgets:", error); // Log any errors
     }
   };
 
