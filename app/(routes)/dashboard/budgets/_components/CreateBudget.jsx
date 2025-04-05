@@ -40,7 +40,7 @@ function CreateBudget() {
         .values({
           name,
           amount: parseFloat(amount), // Convert amount to float
-          createdBy: user?.primaryEmailAddress || "unknown@example.com", // Ensure valid email
+          createdBy: user?.primaryEmailAddress?.emailAddress || "unknown@example.com", // Ensure valid email
           icon: emojiIcon, // Store selected emoji as budget icon
         })
         .returning();
