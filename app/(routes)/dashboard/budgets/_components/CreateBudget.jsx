@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { db } from "@/utils/dbConfig";
 import { useUser } from "@clerk/nextjs"; // Import Clerk Auth for user authentication
 
-function CreateBudget() {
+function CreateBudget({refreshData}) {
   const { user } = useUser(); // Fetch authenticated user details
   const [emojiIcon, setEmojiIcon] = useState("😊"); // State for budget category icon
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false); // State to toggle emoji picker
@@ -44,8 +44,11 @@ function CreateBudget() {
           icon: emojiIcon, // Store selected emoji as budget icon
         })
         .returning();
-
-      toast.success("New Budget Created!"); // Show success message
+      if(result){
+        refreshData();
+        toast.success("New Budget Created!");
+      }
+      // Show success message
     } catch (error) {
       toast.error("Error creating budget: " + error.message); // Show error message if insertion fails
     }
@@ -82,7 +85,7 @@ function CreateBudget() {
 
             {/* Emoji picker component */}
             {openEmojiPicker && (
-              <div className="absolute">
+              <div className="absolute z-20">
                 <EmojiPicker
                   onEmojiClick={(e) => {
                     setEmojiIcon(e.emoji); // Update selected emoji
