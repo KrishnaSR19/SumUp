@@ -26,7 +26,7 @@ function Cardinfo({ budgetList }) {
   };
   return (
     <div>
-      {budgetList ? (
+      {budgetList?.length>0? (
         <div className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <div className="p-7 mt-2 border rounded-lg flex  items-center justify-between">
             <div>
@@ -54,7 +54,13 @@ function Cardinfo({ budgetList }) {
           </div>
         </div>
       ) : (
-        <div>{[1,2,3].map((item,index)=>{})}</div>
+        <div 
+        className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1,2,3].map((item,index)=>(
+            <div className="h-[110px] w-full bg-slate-200 animate-pulse rounded-lg">
+
+            </div>
+        ))}</div>
       )}
     </div>
   );
