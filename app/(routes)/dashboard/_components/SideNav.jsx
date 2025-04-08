@@ -21,7 +21,8 @@ function SideNav() {
     <div className="h-screen p-5 border shadow-sm">
       {/* Logo */}
       <div className="flex justify-center pr-6">
-        <Image src="/logo.svg" alt="logo" width={100} height={50} />
+        <Link href={'/'}><Image src="/logo.png" alt="logo" width={120} height={50} priority style={{ height: "auto" }}  /></Link>
+        
       </div>
 
       {/* Navigation List */}
@@ -40,7 +41,7 @@ function SideNav() {
       </div>
 
       {/* User Button with Increased Size */}
-      <div className="fixed bottom-10 left-5 scale-150">
+      <div className="fixed bottom-10 left-15 scale-130">
         <UserButton />
       </div>
     </div>
