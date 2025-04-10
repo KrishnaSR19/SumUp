@@ -74,7 +74,7 @@ function DailyExpense() {
           variant="outline"
           onClick={() => router.push("/dashboard/expenses/allexpense")}
           title="Go to All Expenses"
-          className="flex items-center gap-2 bg-indigo-500 text-white hover:bg-indigo-600 transition"
+          className="flex items-center gap-2 bg-indigo-500 text-white hover:bg-indigo-600 transition hover:cursor-pointer"
         >
           <Notebook className="w-5 h-5" strokeWidth={1.5} />
           All Expenses
