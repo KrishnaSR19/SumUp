@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link"; 
 import { usePathname } from "next/navigation";
-import { LayoutGrid, PiggyBank, ReceiptText, ShieldCheck } from "lucide-react";
+import { LayoutGrid, PiggyBank, ReceiptText } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 
 function SideNav() {
@@ -12,17 +12,37 @@ function SideNav() {
     { id: 1, name: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
     { id: 2, name: "Budgets", icon: PiggyBank, path: "/dashboard/budgets" },
     { id: 3, name: "Expenses", icon: ReceiptText, path: "/dashboard/expenses" },
-    { id: 4, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+    {
+      id: 4,
+      name: "Manage with AI",
+      icon: () => (
+        <Image
+          src="/gemini.svg"
+          alt="Gemini AI"
+          width={20}
+          height={20}
+        />
+      ),
+      path: "/dashboard/ask-ai",
+    },
   ];
 
   const path = usePathname();
 
   return (
-    <div className="h-screen p-5 border shadow-sm">
+    <div className="h-screen p-5 border shadow-sm bg-slate-100">
       {/* Logo */}
       <div className="flex justify-center pr-6">
-        <Link href={'/'}><Image src="/logo.png" alt="logo" width={120} height={50} priority style={{ height: "auto" }}  /></Link>
-        
+        <Link href={'/'}>
+          <Image
+            src="/logo.png"
+            alt="logo"
+            width={120}
+            height={50}
+            priority
+            style={{ height: "auto" }}
+          />
+        </Link>
       </div>
 
       {/* Navigation List */}
