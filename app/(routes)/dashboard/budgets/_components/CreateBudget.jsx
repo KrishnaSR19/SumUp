@@ -19,12 +19,22 @@ import { toast } from "sonner";
 import { db } from "@/utils/dbConfig";
 import { useUser } from "@clerk/nextjs"; // Import Clerk Auth for user authentication
 
-function CreateBudget({refreshData}) {
+function CreateBudget({ refreshData }) {
   const { user } = useUser(); // Fetch authenticated user details
   const [emojiIcon, setEmojiIcon] = useState("😊"); // State for budget category icon
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false); // State to toggle emoji picker
   const [name, setName] = useState(""); // State for budget name
   const [amount, setAmount] = useState(""); // State for budget amount
+
+  // Helper: Display a message based on amount
+  const getBudgetMessage = () => {
+    const amt = parseFloat(amount);
+    if (amt <= 0 || isNaN(amt)) return "⚠️ Enter a valid positive amount.";
+    if (amt < 500) return "⚠️ Small budget. Prioritize wisely.";
+    if (amt < 2000) return "🙂 Moderate budget. Plan your categories.";
+    if (amt < 10000) return "💡 Healthy budget. Track expenses regularly.";
+    return "🚀 Large budget! Use wisely and review often.";
+  };
 
   // Function to handle budget creation
   const onCreateBudget = async () => {
@@ -44,13 +54,13 @@ function CreateBudget({refreshData}) {
           icon: emojiIcon, // Store selected emoji as budget icon
         })
         .returning();
-      if(result){
+
+      if (result) {
         refreshData();
-        toast.success("New Budget Created!");
+        toast.success("🎉 New Budget Created!");
       }
-      // Show success message
     } catch (error) {
-      toast.error("Error creating budget: " + error.message); // Show error message if insertion fails
+      toast.error("Error creating budget: " + error.message);
     }
   };
 
@@ -59,7 +69,7 @@ function CreateBudget({refreshData}) {
       {/* Dialog for creating a new budget */}
       <Dialog>
         <DialogTrigger asChild>
-          <button className="w-full h-full bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md">
+          <button className="w-full h-full bg-slate-100 p-10  rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:bg-green-100">
             <h2 className="text-3xl">+</h2>
             Create New Budget
           </button>
@@ -88,8 +98,8 @@ function CreateBudget({refreshData}) {
               <div className="absolute z-20">
                 <EmojiPicker
                   onEmojiClick={(e) => {
-                    setEmojiIcon(e.emoji); // Update selected emoji
-                    setOpenEmojiPicker(false); // Close picker after selection
+                    setEmojiIcon(e.emoji);
+                    setOpenEmojiPicker(false);
                   }}
                 />
               </div>
@@ -114,11 +124,18 @@ function CreateBudget({refreshData}) {
               />
             </div>
 
+            {/* Show budget insight message */}
+            {amount && (
+              <div className="text-sm mt-2 text-gray-600 italic">
+                {getBudgetMessage()}
+              </div>
+            )}
+
             {/* Button to create budget */}
             <DialogFooter className="sm:justify-start">
               <DialogClose asChild>
                 <Button
-                  disabled={!(name && amount)} // Disable button if fields are empty
+                  disabled={!(name && amount)}
                   onClick={onCreateBudget}
                   className="mt-5 w-full"
                 >
