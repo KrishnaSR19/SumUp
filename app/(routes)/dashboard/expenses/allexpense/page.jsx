@@ -1,23 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 import { useUser } from "@clerk/nextjs";
 import { db } from "@/utils/dbConfig";
-import { desc, eq, getTableColumns, sql } from "drizzle-orm";
-// import Budgets from '../budgets/page';
+import { desc, eq } from "drizzle-orm";
 import { Budgets, Expenses } from "@/utils/schema";
 import ExpenseListTable from "../_components/ExpenseListTable";
 
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+
 function ExpenseRoute() {
   const [expensesList, setExpensesList] = useState([]);
-
-  // Accessing logged-in user details from Clerk
   const { user } = useUser();
 
-  // Run when user object changes
   useEffect(() => {
     if (user?.primaryEmailAddress?.emailAddress) {
-      // getBudgetList(); // Fetch budgets when user email is available
       getAllExpenses();
     }
   }, [user]);
@@ -35,18 +40,47 @@ function ExpenseRoute() {
       .where(eq(Budgets.createdBy, user?.primaryEmailAddress.emailAddress))
       .orderBy(desc(Expenses.id));
 
-    setExpensesList(result);
+    const parsed = result.map((item) => ({
+      ...item,
+      amount: Number(item.amount),
+    }));
+
+    setExpensesList(parsed);
   };
 
   return (
     <div className="p-3">
-          <h2 className="font-bold text-lg">All Expenses</h2>
+      <h2 className="font-bold text-lg mb-4">All Expenses</h2>
+
       <ExpenseListTable
         expensesList={expensesList}
         refreshData={() => {
-          getBudgetList();
+          getAllExpenses();
         }}
       />
+
+      {/* Line Chart */}
+      {expensesList.length > 0 && (
+        <div className="mt-8 bg-white p-4 rounded-xl shadow-md">
+          <h3 className="text-lg font-semibold mb-3">Expense Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={expensesList.reverse()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="createdAt" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#6366f1"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }
