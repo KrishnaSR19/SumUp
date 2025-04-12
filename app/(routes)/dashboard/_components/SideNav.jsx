@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import Link from "next/link"; 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, PiggyBank, ReceiptText } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
@@ -30,7 +30,7 @@ function SideNav() {
   const path = usePathname();
 
   return (
-    <div className="h-screen p-5 border shadow-sm bg-slate-100">
+    <div className="h-screen p-5 border shadow-sm bg-slate-100 relative">
       {/* Logo */}
       <div className="flex justify-center pr-6">
         <Link href={'/'}>
@@ -60,9 +60,10 @@ function SideNav() {
         ))}
       </div>
 
-      {/* User Button with Increased Size */}
-      <div className="fixed bottom-10 left-15 scale-130">
+      {/* User Button */}
+      <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2 bg-white rounded-full shadow-md border">
         <UserButton />
+        <span className="text-gray-700 font-medium">Profile</span>
       </div>
     </div>
   );
