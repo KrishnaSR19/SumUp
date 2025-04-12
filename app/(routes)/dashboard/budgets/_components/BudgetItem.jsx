@@ -49,9 +49,9 @@ function BudgetItem({ budget }) {
               <h2 className="text-sm text-gray-400">
                 {budget.totalItem} Items
               </h2>
-              <span className="text-xs text-white bg-indigo-500 px-2 py-1 mt-1 inline-block rounded-full">
+              {/* <span className="text-xs text-white bg-indigo-500 px-2 py-1 mt-1 inline-block rounded-full">
                 {budget.category || "General"}
-              </span>
+              </span> */}
             </div>
           </div>
           <h2 className="font-bold text-indigo-600 text-lg">
