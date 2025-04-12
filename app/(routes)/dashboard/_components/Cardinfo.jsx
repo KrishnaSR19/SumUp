@@ -12,7 +12,7 @@ function Cardinfo({ budgetList }) {
   }, [budgetList]);
 
   const CalculateCardInfo = () => {
-    console.log(budgetList);
+    // console.log(budgetList);
     let totalBudget_ = 0;
     let totalSpend_ = 0;
     budgetList.forEach((element) => {
@@ -22,7 +22,7 @@ function Cardinfo({ budgetList }) {
 
     setTotalBudget(totalBudget_);
     setTotalSpend(totalSpend_);
-    console.log(totalBudget_, totalSpend_);
+    // console.log(totalBudget_, totalSpend_);
   };
   return (
     <div>
@@ -34,7 +34,7 @@ function Cardinfo({ budgetList }) {
               <h2 className="font-bold text-2xl">${totalBudget}</h2>
             </div>
 
-            <PiggyBankIcon className="bg-indigo-500 p-3 h-12 w-12 rounded-full text-white" />
+            <PiggyBankIcon className="bg-purple-600 p-3 h-12 w-12 rounded-full text-white" />
           </div>
           <div className="p-7 mt-2 border rounded-lg flex  items-center justify-between">
             <div>
@@ -42,7 +42,7 @@ function Cardinfo({ budgetList }) {
               <h2 className="font-bold text-2xl">${totalSpend}</h2>
             </div>
 
-            <ReceiptIcon className="bg-indigo-500 p-3 h-12 w-12 rounded-full text-white" />
+            <ReceiptIcon className="bg-destructive p-3 h-12 w-12 rounded-full text-white" />
           </div>
           <div className="p-7 mt-2 border rounded-lg flex  items-center justify-between">
             <div>
@@ -50,14 +50,16 @@ function Cardinfo({ budgetList }) {
               <h2 className="font-bold text-2xl">{budgetList?.length}</h2>
             </div>
 
-            <Wallet className="bg-indigo-500 p-3 h-12 w-12 rounded-full text-white" />
+            <Wallet className="bg-emerald-400 p-3 h-12 w-12 rounded-full text-white" />
           </div>
         </div>
       ) : (
         <div 
         className="mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1,2,3].map((item,index)=>(
-            <div className="h-[110px] w-full bg-slate-200 animate-pulse rounded-lg">
+            <div
+            key={index}
+             className="h-[110px] w-full bg-slate-200 animate-pulse rounded-lg">
 
             </div>
         ))}</div>
