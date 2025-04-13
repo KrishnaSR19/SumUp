@@ -110,28 +110,18 @@ export default function LandingPage() {
             What Users Are Saying
           </h2>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                quote: "This app helped me save ₹5,000 in just two months!",
-                name: "Aarav M.",
-              },
-              {
-                quote: "Simple, elegant, and powerful. Best budgeting app I’ve used.",
-                name: "",
-              },
-              {
-                quote: "ExpenseEase keeps me on track with my monthly goals.",
-                name: "Rohit S.",
-              },
-            ].map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-md border dark:border-gray-700"
-              >
-                <p className="text-gray-700 dark:text-gray-300 italic">“{testimonial.quote}”</p>
-                <p className="mt-4 font-semibold text-indigo-600">{testimonial.name}</p>
-              </div>
-            ))}
+            {[{ quote: "This app helped me save ₹5,000 in just two months!", name: "Aarav M." },
+              { quote: "Simple, elegant, and powerful. Best budgeting app I’ve used.", name: "" },
+              { quote: "ExpenseEase keeps me on track with my monthly goals.", name: "Rohit S." }]
+              .map((testimonial, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-md border dark:border-gray-700"
+                >
+                  <p className="text-gray-700 dark:text-gray-300 italic">“{testimonial.quote}”</p>
+                  <p className="mt-4 font-semibold text-indigo-600">{testimonial.name}</p>
+                </div>
+              ))}
           </div>
         </div>
       </section>
