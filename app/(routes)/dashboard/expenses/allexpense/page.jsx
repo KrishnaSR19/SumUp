@@ -48,8 +48,27 @@ function ExpenseRoute() {
     setExpensesList(parsed);
   };
 
+  // Custom Tooltip to show name and amount when hovering
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const { name, amount } = payload[0].payload;
+      return (
+        <div className="custom-tooltip p-2 bg-white rounded-lg shadow-md dark:bg-gray-800">
+          <p className="text-gray-800 dark:text-white">
+            <strong>Expense: </strong>{name}
+          </p>
+          <p className="text-gray-800 dark:text-white">
+            <strong>Amount: </strong>&#x20B9;{amount}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
-    <div className="p-3">
+    <div className="p-3 dark:bg-gray-900 dark:text-white">
       <h2 className="font-bold text-lg mb-4">All Expenses</h2>
 
       <ExpenseListTable
@@ -61,14 +80,15 @@ function ExpenseRoute() {
 
       {/* Line Chart */}
       {expensesList.length > 0 && (
-        <div className="mt-8 bg-white p-4 rounded-xl shadow-md">
+        <div className="mt-8 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
           <h3 className="text-lg font-semibold mb-3">Expense Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={expensesList.reverse()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="createdAt" />
               <YAxis />
-              <Tooltip />
+              {/* Custom Tooltip */}
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Line
                 type="monotone"
