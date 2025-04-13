@@ -38,7 +38,6 @@ function BudgetList() {
       .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId)) // Join with expenses table
       .where(eq(Budgets.createdBy, userEmail))               // Filter by current user's email
       .groupBy(Budgets.id)
-      // .orderBy(desc(Bud))
       ;                                  // Group by budget ID to aggregate
 
     // console.log("Fetched budgets:", result);
@@ -60,7 +59,7 @@ function BudgetList() {
           : [1, 2, 3, 4, 5].map((item, index) => (
               <div
                 key={index}
-                className="w-full bg-slate-200 rounded-lg h-[150px] animate-pulse flex items-center justify-center"
+                className="w-full bg-slate-200 dark:bg-slate-700 rounded-lg h-[150px] animate-pulse flex items-center justify-center"
               >
                   {/* <Image className="w-25 animate-spin animate-pulse" src="/loader.svg" alt="loader" width={10} height={5} /> */}
 
