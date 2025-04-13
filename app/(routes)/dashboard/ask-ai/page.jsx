@@ -1,66 +1,161 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { GoogleGenAI } from "@google/genai";
+import dotenv from "dotenv";
+dotenv.config({ path: './.env.local' });
+import { useUser } from "@clerk/nextjs";
 
-const genAI = new GoogleGenerativeAI("AIzaSyCRYyxrOcuWeyHtdOmQrJ0bURZPQzrMzrU");
 
-export default function AskAIPage() {
-  const [input, setInput] = useState('');
-  const [response, setResponse] = useState('');
+
+
+
+
+// 🔒 API key from .env (set NEXT_PUBLIC_GEMINI_API_KEY in your .env.local)
+const genAI = new GoogleGenAI({
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyA-f6-cEkfoOhZIZF1SU06mek2y8ggCBYk",
+});
+
+export default function AskAiPage() {
+  const [input, setInput] = useState("");
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  
+  const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
+  
+  const { user } = useUser();
+  // Auto-scroll to bottom on new message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chats]);
+
+  // Auto-focus on input when loading ends
+  useEffect(() => {
+    if (!loading) inputRef.current?.focus();
+  }, [loading]);
 
   const handleAsk = async () => {
     if (!input.trim()) return;
-
     setLoading(true);
-    setResponse('');
-    setError('');
+    setError("");
+
+    const userMessage = {
+      sender: "user",
+      message: input.trim(),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'models/gemini-pro' });
-      const result = await model.generateContent(input);
-      const geminiResponse = await result.response;
-      setResponse(geminiResponse.text());
+      const result = await genAI.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: [{ role: "user", parts: [{ text: input }] }],
+      });
+
+      const geminiResponse = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (geminiResponse) {
+        const assistantMessage = {
+          sender: "assistant",
+          message: geminiResponse,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        };
+
+        setChats((prev) => [...prev, userMessage, assistantMessage]);
+        setInput("");
+      } else {
+        throw new Error("No response received.");
+      }
     } catch (err) {
-      console.error(err);
-      setError('Something went wrong. Please check the API key or your input.');
+      console.error("Gemini API Error:", err);
+      setError("Something went wrong. Please check your API key or internet connection.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleAsk();
+    }
+  };
+
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Ask Gemini AI</h1>
-
-      <textarea
-        className="w-full p-2 border rounded mb-4"
-        rows={4}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Ask anything..."
-      />
-
-      <button
-        onClick={handleAsk}
-        disabled={loading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        {loading ? 'Thinking...' : 'Ask'}
-      </button>
-
-      {response && (
-        <div className="mt-6 p-4 bg-gray-100 rounded">
-          <strong>Gemini says:</strong>
-          <p className="mt-2 whitespace-pre-line">{response}</p>
+    <div className="bg-slate-200">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-4">
+          <Image src="/gemini.svg" alt="Gemini AI" width={24} height={24} />
+          <h1 className="text-4xl font-bold text-blue-700 dark:text-white">Ask with AI</h1>
         </div>
-      )}
 
-      {error && (
-        <div className="mt-4 text-red-500 font-medium">{error}</div>
-      )}
+        {/* Chat Window */}
+        <div className="flex-1 overflow-y-auto space-y-4 p-4 focus:ring-blue-500 dark:bg-gray-800 rounded-lg">
+          {chats.length === 0 ? (
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              Hii {user?.fullName}. Start by asking a question.
+            </div>
+          ) : (
+            chats.map((chat, index) => (
+              <div
+                key={index}
+                className={`flex ${chat.sender === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[70%] p-4 rounded-xl shadow-sm transition-all duration-300 ${
+                    chat.sender === "user"
+                      ? "bg-blue-100 dark:bg-blue-600 text-gray-900 dark:text-white rounded-br-none"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-none"
+                  }`}
+                >
+                  <div className="flex justify-between mb-1">
+                    <span className="font-medium">
+                      {chat.sender === "user" ? "You" : "Gemini"}
+                    </span>
+                    <span className="text-sm text-gray-500">{chat.time}</span>
+                  </div>
+                  <p className="whitespace-pre-wrap">{chat.message}</p>
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="sticky bottom-4 z-10 flex justify-center px-4">
+          <div className="relative w-full max-w-3xl">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask something..."
+              className="w-full pr-14 p-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 bg-slate-300 dark:text-white resize-none"
+              rows={3}
+            />
+            <button
+              onClick={handleAsk}
+              disabled={loading || !input.trim()}
+              className="absolute bottom-3 right-3 w-10 h-10 p-2 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="text-white text-xs animate-pulse">...</span>
+              ) : (
+                <Image src="/send.svg" alt="Send" width={20} height={20} priority />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 text-center text-red-600 font-medium">{error}</div>
+        )}
+      </div>
     </div>
   );
 }
