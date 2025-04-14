@@ -1,86 +1,68 @@
-"use client"; // Enables client-side rendering
+"use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation"; // Next.js router for navigation
-import { useUser } from "@clerk/nextjs"; // Clerk authentication for user data
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
-// Import necessary components
 import SideNav from "./_components/SideNav";
 import DashboardHeader from "./_components/DashboardHeader";
 
-// Import database and schema
-import { Budgets } from "@/utils/schema"; 
-import { db } from "@/utils/dbConfig"; // Ensure this is correctly exported in dbConfig.js
-
-import { eq } from "drizzle-orm"; // Import Drizzle ORM query function
+import { Budgets } from "@/utils/schema";
+import { db } from "@/utils/dbConfig";
+import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
 function DashboardLayout({ children }) {
-  // Get the logged-in user from Clerk
   const { user } = useUser();
-
-  // Initialize Next.js router
   const router = useRouter();
 
-  // // Debugging logs to check if imports and user data are correctly loaded
-  // console.log("DB Instance:", db); // Ensure `db` is properly imported
-  // console.log("Budgets Schema:", Budgets); // Verify that `Budgets` schema is imported correctly
-  // console.log("User Object:", user); // Check if the user object is available
-
-  // Run `checkUserBudgets` when the `user` state changes
   useEffect(() => {
     if (user) {
       checkUserBudgets();
     }
   }, [user]);
 
-  // Function to check if the user has any budgets
   const checkUserBudgets = async () => {
     try {
-      // console.log("User Email:", user?.primaryEmailAddress?.emailAddress); // Log user email for debugging
+      if (!db || !Budgets) throw new Error("DB or schema is not properly initialized");
 
-      // Ensure `db` and `Budgets` schema are correctly initialized
-      if (!db || !Budgets) {
-        throw new Error("DB or Budgets schema is not properly initialized");
-      }
+      const email = user?.primaryEmailAddress?.emailAddress;
+      if (!email) throw new Error("User email not found");
 
-      // Ensure user email is available before querying the database
-      if (!user?.primaryEmailAddress?.emailAddress) {
-        throw new Error("User email is undefined");
-      }
-
-      // Query the database to check if the user has any budgets
       const result = await db
-        .select() // Select all columns
-        .from(Budgets) // From the `Budgets` table
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress.emailAddress)) // Filter by user's email
-        .execute(); // Execute the query (required for Drizzle ORM)
+        .select()
+        .from(Budgets)
+        .where(eq(Budgets.createdBy, email));
 
-      // console.log("Query Result:", result); // Log the result for debugging
+      // Some Drizzle dialects (like Planetscale/MySQL) may need `.execute()`:
+      // const result = await db
+      //   .select()
+      //   .from(Budgets)
+      //   .where(eq(Budgets.createdBy, email))
+      //   .execute();
 
-      // If the user has no budgets, redirect them to the budgets page
       if (!result || result.length === 0) {
-        router.replace("/dashboard/budgets"); // Redirect user to budget creation page
+        router.replace("/dashboard/budgets");
       }
     } catch (error) {
-      toast.error("Error fetching budgets:", error); // Log any errors
+      toast.error("Error checking budgets: " + error.message);
     }
   };
 
   return (
-    <div>
-      {/* Sidebar Navigation */}
-      <div className="fixed md:w-64 hidden md:block">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white flex">
+      {/* Sidebar */}
+      <div className="fixed md:w-64 hidden md:block h-full border-r border-gray-200 dark:border-gray-700">
         <SideNav />
       </div>
 
-      {/* Main Content Area */}
-      <div className="md:ml-64">
+      {/* Main Content */}
+      <div className="flex-1 md:ml-64 flex flex-col">
         <DashboardHeader />
-        {children} {/* Render child components */}
+        <main className="flex-1 p-4">{children}</main>
       </div>
     </div>
   );
 }
 
-export default DashboardLayout; // Export the layout component
+export default DashboardLayout;
