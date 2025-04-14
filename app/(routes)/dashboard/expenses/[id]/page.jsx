@@ -9,8 +9,15 @@ import BudgetItem from "../../budgets/_components/BudgetItem";
 import AddExpense from "../_components/AddExpense";
 import ExpenseListTable from "../_components/ExpenseListTable";
 import { Button } from "@/components/ui/button";
-import { Router, Trash } from "lucide-react";
-import { useRouter } from "next/navigation"; 
+import {
+  ArrowLeft,
+  ArrowLeftIcon,
+  PenBox,
+  PenBoxIcon,
+  Router,
+  Trash,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +30,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import EditBudget from "../_components/EditBudget";
 
 function ExpensesScreen() {
   const { user } = useUser();
-  const params = useParams(); // ✅ use the hook
+  const params = useParams(); //  use the hook
   const [budgetInfo, setBudgetInfo] = useState(null);
   const [expensesList, setExpensesList] = useState([]);
   const router = useRouter();
@@ -79,36 +87,42 @@ function ExpensesScreen() {
     setExpensesList(result);
     // console.log(result);
   };
- 
 
   //Used to delete Budget
-  const deleteBudget=async()=>{
-
-    const deleteExpenseResult=await db.delete(Expenses)
-    .where(eq(Expenses.budgetId,params.id))
-    .returning()
-    ;
-
-    if(deleteExpenseResult){
-      const result = await db.delete(Budgets)
-      .where(eq(Budgets.id,params.id))
+  const deleteBudget = async () => {
+    const deleteExpenseResult = await db
+      .delete(Expenses)
+      .where(eq(Expenses.budgetId, params.id))
       .returning();
+    if (deleteExpenseResult) {
+      const result = await db
+        .delete(Budgets)
+        .where(eq(Budgets.id, params.id))
+        .returning();
       // console.log(result);
     }
     toast.success("Budget & Expenses Deleted!");
     router.replace("/dashboard/budgets");
-   
-    
-  }
-
+  };
 
   return (
     <div className="p-10">
       <h2 className="text-2xl font-bold flex justify-between items-center">
-        My Expenses
+        <span className="flex gap-2 items-center">
+          <ArrowLeftIcon
+            onClick={() => router.replace("/dashboard/budgets")}
+            className="cursor-pointer mt-1"
+          />
+          My Expenses
+        </span>
+
+        <div className="flex gap-2 items-center mt-2">
+          <EditBudget budgetInfo={budgetInfo} refreshData={()=>getBudgetInfo()} />
+        </div>
+
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button className="flex gap-2 w-20 mt-2" variant="destructive">
+            <Button className="flex gap-2 w-20 mt-2 cursor-pointer" variant="destructive">
               <Trash />
               Delete
             </Button>
@@ -117,13 +131,16 @@ function ExpensesScreen() {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your current
-                budget along with expenses and remove your data from our servers.
+                This action cannot be undone. This will permanently delete your
+                current budget along with expenses and remove your data from our
+                servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={()=>deleteBudget()}>Continue</AlertDialogAction>
+              <AlertDialogAction onClick={() => deleteBudget()}>
+                Continue
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -140,7 +157,6 @@ function ExpensesScreen() {
           refreshData={() => getBudgetInfo()}
         />
       </div>
-      <h2 className="font-bold text-lg">Latest Expenses</h2>
       <ExpenseListTable
         expensesList={expensesList}
         refreshData={() => getBudgetInfo()}
