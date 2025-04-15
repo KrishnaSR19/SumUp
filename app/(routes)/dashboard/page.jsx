@@ -4,90 +4,116 @@ import React, { useEffect, useState } from "react";
 import Cardinfo from "./_components/Cardinfo";
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
-import { and, desc,getTableColumns, eq, sql } from "drizzle-orm";
-import { useParams } from "next/navigation";
+import { and, desc, getTableColumns, eq, sql } from "drizzle-orm";
 import BarChartDashboard from "./_components/BarChartDashboard";
 import BudgetItem from "./budgets/_components/BudgetItem";
 import ExpenseListTable from "./expenses/_components/ExpenseListTable";
+import { Input } from "@/components/ui/input";
 
 function Dashboard() {
-  // State to store list of budgets fetched from the database
   const [budgetList, setBudgetList] = useState([]);
-  const [expensesList,setExpensesList]=useState([]);
-
-  // Accessing logged-in user details from Clerk
+  const [expensesList, setExpensesList] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useUser();
 
-  // Run when user object changes
   useEffect(() => {
     if (user?.primaryEmailAddress?.emailAddress) {
-      getBudgetList(); // Fetch budgets when user email is available
+      getBudgetList();
     }
   }, [user]);
 
-  // Fetch budgets created by the current user, along with spend & item count
+  /**
+   Gets all the budget created by user
+   */
+
   const getBudgetList = async () => {
     const userEmail = user?.primaryEmailAddress?.emailAddress;
     if (!userEmail) return;
 
     const result = await db
       .select({
-        ...getTableColumns(Budgets), // All budget fields
-        totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number), // Total expenses for each budget
-        totalItem: sql`count(${Expenses.id})`.mapWith(Number),    // Number of expense entries
+        ...getTableColumns(Budgets),
+        totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+        totalItem: sql`count(${Expenses.id})`.mapWith(Number),
       })
       .from(Budgets)
-      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId)) // Join with expenses table
-      .where(eq(Budgets.createdBy, userEmail))               // Filter by current user's email
+      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, userEmail))
       .groupBy(Budgets.id)
-      .orderBy(desc(Budgets.id))
-      ;                                  // Group by budget ID to aggregate
+      .orderBy(desc(Budgets.id));
 
-    // console.log("Fetched budgets:", result);
-    setBudgetList(result); // Save the result to state
+    setBudgetList(result);
     getAllExpenses();
   };
- 
-  //Used to get all Expenses belong to users
-  const getAllExpenses=async()=>{
-    const result =await db.select({
-      id:Expenses.id,
-      name:Expenses.name,
-      amount:Expenses.amount,
-      createdAt:Expenses.createdAt
 
-    }).from(Budgets)
-    .rightJoin(Expenses,eq(Budgets.id,Expenses.budgetId))
-    .where(eq(Budgets.createdBy,user?.primaryEmailAddress.emailAddress))
-    .orderBy(desc(Expenses.id));
+  /**
+   * Gets all the expenses created by user
+   */
+
+  const getAllExpenses = async () => {
+    const result = await db
+      .select({
+        id: Expenses.id,
+        name: Expenses.name,
+        amount: Expenses.amount,
+        createdAt: Expenses.createdAt,
+      })
+      .from(Budgets)
+      .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, user?.primaryEmailAddress.emailAddress))
+      .orderBy(desc(Expenses.id));
 
     setExpensesList(result);
-  }
+    setFilteredExpenses(result); // Default view
+  };
+
+  /*
+   logic for searching in expense
+  */
+
+  const handleSearch = (query) => {
+    setSearchTerm(query);
+    const filtered = expensesList.filter((item) =>
+      item.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredExpenses(filtered);
+  };
 
   return (
     <div className="p-8">
-      <h2 className="font-bold text-3xl">Hi , {user?.fullName}😃</h2>
+      <h2 className="font-bold text-3xl">Hi, {user?.fullName}! 😃</h2>
       <p className="text-gray-500">
-        Here's what happening with your money.Lets Manage
+        Here's what's happening with your money. Let’s manage it wisely.
       </p>
+
       <Cardinfo budgetList={budgetList} />
+
       <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-1.5">
         <div className="md:col-span-2">
-          <BarChartDashboard budgetList={budgetList}/>
-      <ExpenseListTable
-      expensesList={expensesList}
-      refreshData={()=>{
-        getBudgetList();
-      }}
-      />
+          <BarChartDashboard budgetList={budgetList} />
+
+          {/* Search input */}
+          <Input
+            placeholder="🔎Search expenses..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="my-4"
+          />
+
+          <ExpenseListTable
+            expensesList={filteredExpenses}
+            refreshData={() => {
+              getBudgetList();
+            }}
+          />
         </div>
 
-      <div className="grid gap-5">
-        <h2 className="font-bold text-2xl">Latest Budgets</h2>
-         {budgetList.map((budget,index)=>(
-          <BudgetItem budget={budget} key={index}/>
-
-         ))}
+        <div className="grid gap-5">
+          <h2 className="font-bold text-2xl">Latest Budgets</h2>
+          {budgetList.map((budget, index) => (
+            <BudgetItem budget={budget} key={index} />
+          ))}
         </div>
       </div>
     </div>
