@@ -30,7 +30,7 @@ function SideNav() {
   const path = usePathname();
 
   return (
-    <div className="h-screen p-5 border shadow-sm bg-slate-100 relative">
+    <div className="h-screen p-5 border shadow-sm bg-slate-100 dark:bg-slate-800 dark:border-slate-700 relative">
       {/* Logo */}
       <div className="flex justify-center pr-6">
         <Link href={'/'}>
@@ -50,8 +50,8 @@ function SideNav() {
         {menuList.map((menu) => (
           <Link href={menu.path} key={menu.id} className="block">
             <h2
-              className={`flex gap-2 items-center mb-2 text-gray-700 font-medium p-5 cursor-pointer rounded-md hover:text-indigo-600 hover:bg-blue-100
-              ${path === menu.path ? "text-indigo-600 bg-blue-100" : ""}`}
+              className={`flex gap-2 items-center mb-2 text-gray-700 dark:text-gray-300 font-medium p-5 cursor-pointer rounded-md hover:text-indigo-600 hover:bg-blue-100 dark:hover:bg-blue-900
+              ${path === menu.path ? "text-indigo-600 bg-blue-100 dark:text-indigo-400 dark:bg-blue-900" : ""}`}
             >
               <menu.icon className="w-5 h-5" />
               {menu.name}
@@ -61,9 +61,15 @@ function SideNav() {
       </div>
 
       {/* User Button */}
-      <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2 bg-white rounded-full shadow-md border">
+      <div className="absolute bottom-6 left-6 flex items-center gap-3 p-2 bg-white dark:bg-slate-700 rounded-full shadow-md border dark:border-slate-600">
         <UserButton />
-        <span className="text-gray-700 font-medium">Profile</span>
+        <span className="text-gray-700 dark:text-gray-300 font-medium">Profile</span>
+      </div>
+
+      {/* Optional Mobile Responsive Adjustment */}
+      <div className="md:hidden absolute top-4 right-4 p-2 bg-gray-100 dark:bg-slate-600 rounded-full shadow-md">
+        {/* Mobile hamburger menu (icon can be added) */}
+        <button className="text-gray-700 dark:text-gray-300">☰</button>
       </div>
     </div>
   );
