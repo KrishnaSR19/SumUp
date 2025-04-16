@@ -69,16 +69,16 @@ function CreateBudget({ refreshData }) {
       {/* Dialog for creating a new budget */}
       <Dialog>
         <DialogTrigger asChild>
-          <button className="w-full h-full bg-slate-100 p-10  rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:bg-green-100">
+          <button className="w-full h-full bg-slate-100 dark:bg-slate-700 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md hover:bg-green-100 dark:hover:bg-green-600">
             <h2 className="text-3xl">+</h2>
             Create New Budget
           </button>
         </DialogTrigger>
 
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-slate-800">
           <DialogHeader>
-            <DialogTitle>Create New Budget</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-black dark:text-white">Create New Budget</DialogTitle>
+            <DialogDescription className="text-gray-700 dark:text-gray-300">
               Fill in the details below to create a budget.
             </DialogDescription>
           </DialogHeader>
@@ -87,7 +87,7 @@ function CreateBudget({ refreshData }) {
             {/* Button to open emoji picker */}
             <Button
               variant="outline"
-              className="text-large"
+              className="text-large dark:text-white dark:bg-slate-700"
               onClick={() => setOpenEmojiPicker(!openEmojiPicker)}
             >
               {emojiIcon}
@@ -107,26 +107,28 @@ function CreateBudget({ refreshData }) {
 
             {/* Input for budget name */}
             <div className="mt-2">
-              <h2 className="text-black font-medium my-1">Budget Name</h2>
+              <h2 className="text-black dark:text-white font-medium my-1">Budget Name</h2>
               <Input
                 placeholder="e.g., Home Decor"
                 onChange={(e) => setName(e.target.value)}
+                className="dark:bg-slate-700 dark:text-white"
               />
             </div>
 
             {/* Input for budget amount */}
             <div className="mt-2">
-              <h2 className="text-black font-medium my-1">Budget Amount</h2>
+              <h2 className="text-black dark:text-white font-medium my-1">Budget Amount</h2>
               <Input
                 type="number"
                 placeholder="e.g., ₹5000"
                 onChange={(e) => setAmount(e.target.value)}
+                className="dark:bg-slate-700 dark:text-white"
               />
             </div>
 
             {/* Show budget insight message */}
             {amount && (
-              <div className="text-sm mt-2 text-gray-600 italic">
+              <div className="text-sm mt-2 text-gray-600 dark:text-gray-300 italic">
                 {getBudgetMessage()}
               </div>
             )}
