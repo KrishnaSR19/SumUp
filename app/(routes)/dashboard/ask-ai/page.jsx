@@ -4,15 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
-dotenv.config({ path: './.env.local' });
+dotenv.config({ path: "./.env.local" });
 import { useUser } from "@clerk/nextjs";
 
-
-
-
-
-
-// 🔒 API key from .env (set NEXT_PUBLIC_GEMINI_API_KEY in your .env.local)
 const genAI = new GoogleGenAI({
   apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyA-f6-cEkfoOhZIZF1SU06mek2y8ggCBYk",
 });
@@ -22,17 +16,15 @@ export default function AskAiPage() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
-  
   const { user } = useUser();
-  // Auto-scroll to bottom on new message
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chats]);
 
-  // Auto-focus on input when loading ends
   useEffect(() => {
     if (!loading) inputRef.current?.focus();
   }, [loading]);
@@ -84,19 +76,21 @@ export default function AskAiPage() {
   };
 
   return (
-    <div className="bg-slate-200">
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="bg-slate-200 dark:bg-gray-900 transition-colors">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-900 p-4">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <Image src="/gemini.svg" alt="Gemini AI" width={24} height={24} />
-          <h1 className="text-4xl font-bold text-blue-700 dark:text-white">Ask with AI</h1>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Image src="/gemini.svg" alt="Gemini AI" width={24} height={24} />
+            <h1 className="text-4xl font-bold text-blue-700 dark:text-white">Ask with AI</h1>
+          </div>
         </div>
 
         {/* Chat Window */}
-        <div className="flex-1 overflow-y-auto space-y-4 p-4 focus:ring-blue-500 dark:bg-gray-800 rounded-lg">
+        <div className="flex-1 overflow-y-auto space-y-4 p-4 dark:bg-gray-900 rounded-lg">
           {chats.length === 0 ? (
             <div className="text-center text-gray-500 dark:text-gray-400">
-              Hii {user?.fullName}. Start by asking a question.
+              Hi {user?.fullName}. Start by asking a question.
             </div>
           ) : (
             chats.map((chat, index) => (
@@ -105,19 +99,21 @@ export default function AskAiPage() {
                 className={`flex ${chat.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[70%] p-4 rounded-xl shadow-sm transition-all duration-300 ${
+                  className={`max-w-[75%] rounded-2xl p-4 text-sm shadow-sm transition-all ${
                     chat.sender === "user"
-                      ? "bg-blue-100 dark:bg-blue-600 text-gray-900 dark:text-white rounded-br-none"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-none"
+                      ? "bg-blue-600 text-white rounded-br-none"
+                      : "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-none"
                   }`}
                 >
-                  <div className="flex justify-between mb-1">
-                    <span className="font-medium">
+                  <div className="flex justify-between items-center mb-1 gap-4">
+                    <span className="font-semibold">
                       {chat.sender === "user" ? "You" : "Gemini"}
                     </span>
-                    <span className="text-sm text-gray-500">{chat.time}</span>
+                    <span className="text-xs text-gray-300 dark:text-gray-400 whitespace-nowrap">
+                      {chat.time}
+                    </span>
                   </div>
-                  <p className="whitespace-pre-wrap">{chat.message}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed">{chat.message}</p>
                 </div>
               </div>
             ))
@@ -134,7 +130,7 @@ export default function AskAiPage() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask something..."
-              className="w-full pr-14 p-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 bg-slate-300 dark:text-white resize-none"
+              className="w-full pr-14 p-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 bg-slate-300 dark:bg-gray-700 dark:text-white resize-none"
               rows={3}
             />
             <button
