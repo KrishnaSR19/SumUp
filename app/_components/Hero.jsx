@@ -1,15 +1,16 @@
 "use client";
+
 import React, { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Features from "./Features";
 import { ThumbsUp, ShieldCheck, Zap } from "lucide-react";
-import useDarkMode from "../_hooks/useDarkMode"
+import useDarkMode from "../_hooks/useDarkMode";
 
 export default function LandingPage() {
   const { isSignedIn } = useUser();
   const router = useRouter();
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { isDarkMode } = useDarkMode();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -19,8 +20,6 @@ export default function LandingPage() {
 
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen flex flex-col justify-between">
-
-
       {/* Hero Section */}
       <section className="flex flex-col items-center">
         <div className="w-full max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28 text-center">
@@ -52,8 +51,9 @@ export default function LandingPage() {
           )}
         </div>
 
+        {/* Dynamic Hero Image */}
         <img
-          src="/dashboard.png"
+          src={isDarkMode ? "/dashboard_black.png" : "/dashboard_white.png"}
           alt="Dashboard preview"
           width={1000}
           height={500}
@@ -69,7 +69,7 @@ export default function LandingPage() {
       <section className="bg-white dark:bg-gray-950 py-20 px-4">
         <div className="max-w-screen-xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white">
-            Why Choose ExpenseEase?
+            Why Choose SumUp?
           </h2>
           <p className="mt-4 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Designed with simplicity and power in mind, we help you master your finances effortlessly.
@@ -116,7 +116,7 @@ export default function LandingPage() {
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { quote: "This app helped me save ₹5,000 in just two months!", name: "Aarav M." },
-              { quote: "Simple, elegant, and powerful. Best budgeting app I’ve used.", name: "" },
+              { quote: "Simple, elegant, and powerful. Best budgeting app I’ve used.", name: "Mrudula T." },
               { quote: "ExpenseEase keeps me on track with my monthly goals.", name: "Rohit S." }
             ].map((testimonial, idx) => (
               <div
