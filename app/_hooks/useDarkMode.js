@@ -1,3 +1,4 @@
+// useDarkMode.ts
 import { useEffect, useState } from "react";
 
 export default function useDarkMode() {
@@ -5,12 +6,15 @@ export default function useDarkMode() {
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
+
+    if (stored) {
+      const isDark = stored === "dark";
+      setIsDarkMode(isDark);
+      document.documentElement.classList.toggle("dark", isDark);
     } else {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove("dark");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setIsDarkMode(prefersDark);
+      document.documentElement.classList.toggle("dark", prefersDark);
     }
   }, []);
 
