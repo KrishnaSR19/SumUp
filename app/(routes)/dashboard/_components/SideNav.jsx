@@ -68,6 +68,7 @@ function SideNav() {
 
       {/* Optional Mobile Responsive Adjustment */}
       <div className="md:hidden absolute top-4 right-4 p-2 bg-gray-100 dark:bg-slate-600 rounded-full shadow-md">
+        
         {/* Mobile hamburger menu (icon can be added) */}
         <button className="text-gray-700 dark:text-gray-300">☰</button>
       </div>
