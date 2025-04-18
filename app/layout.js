@@ -9,7 +9,7 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata = {
   title: "SumUp",
-  description: "Track Expense With Ease",
+  description: "Track Your Expense With Ease",
 };
 
 export default function RootLayout({ children }) {
