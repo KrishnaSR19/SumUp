@@ -16,6 +16,6 @@ export default defineConfig({
   out: './drizzle/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url:"postgresql://Expense-Tracker_owner:npg_tHd5mQiBjVa9@ep-muddy-rain-a1rcql7r-pooler.ap-southeast-1.aws.neon.tech/Expense-Tracker?sslmode=require",
+    url:process.env.NEXT_PUBLIC_DATABASE_URL,
   },
 });
